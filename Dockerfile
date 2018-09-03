@@ -1,4 +1,4 @@
-FROM gettyimages/spark:spark-2.3.1-hadoop-3.0.0
+FROM gettyimages/spark:2.3.1-hadoop-3.0.0
 
 RUN pip install \
      numpy \
