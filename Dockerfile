@@ -1,6 +1,12 @@
 FROM gettyimages/spark:2.3.1-hadoop-3.0
 
-RUN pip install \
+# install libgomp1 for xgboost
+RUN apt-get update \
+ && apt-get install -y libgomp1 \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir \
      numpy \
      scipy \
      matplotlib \
@@ -9,8 +15,10 @@ RUN pip install \
      seaborn \
      bokeh \
      jupyter \
+     jupyterlab \
      ipywidgets \
      sympy \
+     xgboost \
      jupyter_contrib_nbextensions
 
 ENV PYSPARK_PYTHON=/usr/bin/python \
