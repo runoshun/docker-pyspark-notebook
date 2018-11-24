@@ -1,8 +1,15 @@
 #!/bin/bash
 set -eu
 
-SPARK_VERSION=`echo $DOCKER_TAG | sed -ne 's/\([0-9\.]\+\).*/\1/p'`
-HADOOP_VERSION=`echo $DOCKER_TAG | sed -ne 's/[0-9\.]\+-hadoop-\([0-9\.]\+\)/\1/p'`
+if [ "$DOCKER_TAG" = "latest" ]; then
+    TAG=2.4.0
+else
+    TAG=DOCKER_TAG
+fi
+
+
+SPARK_VERSION=`echo $TAG | sed -ne 's/\([0-9\.]\+\).*/\1/p'`
+HADOOP_VERSION=`echo $TAG | sed -ne 's/[0-9\.]\+-hadoop-\([0-9\.]\+\)/\1/p'`
 
 if [ "$DOCKERFILE_PATH" = "" ]; then
     DOCKERFILE_PATH_ARG=""
