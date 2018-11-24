@@ -9,6 +9,17 @@ launch_hdfs_namenode() {
 launch_hdfs_datanode() {
     ${HADOOP_HOME}/bin/hdfs datanode $*
 }
+export PATH=${PATH}:${HADOOP_HOME}/bin:${SPARK_HOME}/bin
+export PYSPARK_PYTHON=/usr/bin/python
+export PYSPARK_DRIVER_PYTHON=/usr/bin/python
+export PYTHONPATH=`ls ${SPARK_HOME}/python/lib/py4j-*`:${SPARK_HOME}/python:$PYTHONPATH
+export PYTHONIOENCODING=UTF-8
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+
+if hash hadoop 2>/dev/null; then
+    export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+fi
+
 
 command=$1
 shift;

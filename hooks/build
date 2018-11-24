@@ -1,0 +1,47 @@
+#!/bin/bash
+set -eu
+
+SPARK_VERSION=`echo $DOCKER_TAG | sed -ne 's/\([0-9\.]\+\).*/\1/p'`
+HADOOP_VERSION=`echo $DOCKER_TAG | sed -ne 's/[0-9\.]\+-hadoop-\([0-9\.]\+\)/\1/p'`
+
+if [ "$DOCKERFILE_PATH" = "" ]; then
+    DOCKERFILE_PATH_ARG=""
+else
+    DOCKERFILE_PATH_ARG="-f $DOCKERFILE_PATH"
+fi
+
+if [ "$HADOOP_VERSION" = "" ]; then
+    case $SPARK_VERSION in
+        2.3*) SPARK_PACKAGE=spark-${SPARK_VERSION}-bin-hadoop2.7;;
+        2.4*) SPARK_PACKAGE=spark-${SPARK_VERSION}-bin-hadoop2.7;;
+        *) >&2 echo "Undefined spark package" ; return 1;;
+    esac
+
+    case $SPARK_VERSION in
+        2.3*) HADOOP_AWS_VERSION=2.7.3;;
+        2.4*) HADOOP_AWS_VERSION=2.7.3;;
+        *) >&2 echo "Undefined spark package" ; return 1;;
+    esac
+else
+    case $SPARK_VERSION in
+        2.3*) SPARK_PACKAGE=spark-${SPARK_VERSION}-bin-without-hadoop;;
+        2.4*) SPARK_PACKAGE=spark-${SPARK_VERSION}-bin-without-hadoop;;
+        *) >&2 echo "Undefined spark package" ; return 1;;
+    esac
+    HADOOP_AWS_VERSION=""
+fi
+
+
+echo docker build \
+    --build-arg SPARK_VERSION=${SPARK_VERSION} \
+    --build-arg SPARK_PACKAGE=${SPARK_PACKAGE} \
+    --build-arg HADOOP_AWS_VERSION=${HADOOP_AWS_VERSION} \
+    --build-arg HADOOP_VERSION=${HADOOP_VERSION} \
+    ${DOCKERFILE_PATH_ARG} -t $IMAGE_NAME .
+docker build \
+    --build-arg SPARK_VERSION=${SPARK_VERSION} \
+    --build-arg SPARK_PACKAGE=${SPARK_PACKAGE} \
+    --build-arg HADOOP_AWS_VERSION=${HADOOP_AWS_VERSION} \
+    --build-arg HADOOP_VERSION=${HADOOP_VERSION} \
+    --force-rm \
+    ${DOCKERFILE_PATH_ARG} -t $IMAGE_NAME .
